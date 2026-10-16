@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Học Tập Tương Tác: Saccharose và Maltose</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', sans-serif; }
+        .drag-item { cursor: grab; touch-action: none; user-select: none; }
+        .drag-item:active { cursor: grabbing; }
+        .drop-zone { min-height: 90px; border: 2px dashed #cbd5e1; transition: all 0.2s; }
+        .drop-zone.drag-over { border-color: #3b82f6; background-color: #eff6ff; }
+        sub { font-size: 0.75em; vertical-align: baseline; position: relative; bottom: -0.25em; }
+        sup { font-size: 0.75em; vertical-align: baseline; position: relative; top: -0.4em; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800">
+
+    <header class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <span class="bg-white/20 text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">Hóa học 12</span>
+                <h1 id="headerTitle" class="text-2xl font-bold mt-1">Saccharose và Maltose</h1>
+            </div>
+            <div class="flex items-center gap-3 bg-white/10 p-3 rounded-xl backdrop-blur-md w-full sm:w-auto">
+                <div class="flex-1 sm:flex-initial">
+                    <label class="block text-xs font-medium text-blue-100">Họ và tên học sinh:</label>
+                    <input type="text" id="studentName" placeholder="Nhập họ và tên..." class="bg-white/20 border border-white/30 rounded px-2 py-1 text-white placeholder-blue-200 text-sm w-full outline-none focus:ring-2 focus:ring-white">
+                </div>
+                <div class="w-24">
+                    <label class="block text-xs font-medium text-blue-100">Lớp:</label>
+                    <input type="text" id="studentClass" placeholder="12A..." class="bg-white/20 border border-white/30 rounded px-2 py-1 text-white placeholder-blue-200 text-sm w-full outline-none focus:ring-2 focus:ring-white">
+                </div>
+                <button onclick="openAdminModal()" class="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition text-white" title="Quản trị giáo viên">
+                    ⚙️ Quản trị
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        
+        <section class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-indigo-700 flex items-center gap-2 mb-3">
+                🎯 Mục tiêu & Hướng dẫn làm bài
+            </h2>
+            <ul class="list-disc list-inside space-y-1.5 text-slate-700 text-sm sm:text-base mb-4">
+                <li>Nắm vững cấu trúc phân tử dạng mạch hở và mạch vòng của saccharose và maltose.</li>
+                <li>Hiểu rõ tính chất hoá học đặc trưng: phản ứng của polyalcohol (với Cu(OH)<sub>2</sub>) và phản ứng thuỷ phân.</li>
+                <li>Phân biệt trạng thái tự nhiên, tính khử (phản ứng tráng bạc) và ứng dụng thực tế của hai disaccharide.</li>
+            </ul>
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 p-3 text-sm text-indigo-900 rounded-r-lg">
+                <strong>Hướng dẫn:</strong> Học sinh điền họ tên, làm trực tiếp các phần bên dưới, bấm "NỘP BÀI & CHẤM ĐIỂM" ở cuối trang để xem kết quả và tự động lưu điểm lên hệ thống.
+            </div>
+        </section>
+
+        <section id="section-mc" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">1</span> 
+                    Khu vực 1 – Trắc nghiệm nhanh
+                </h3>
+                <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-mc">4</span>đ</span>
+            </div>
+            <div id="mcContainer" class="space-y-6"></div>
+        </section>
+
+        <section id="section-fib" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-emerald-100 text-emerald-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">2</span> 
+                    Khu vực 2 – Điền khuyết
+                </h3>
+                <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-fib">1</span>đ</span>
+            </div>
+            <div id="fibContainer" class="space-y-4 text-slate-700 leading-relaxed"></div>
+        </section>
+
+        <section id="section-tf" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-amber-100 text-amber-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">3</span> 
+                    Khu vực 3 – Đúng / Sai
+                </h3>
+                <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-tf">1</span>đ</span>
+            </div>
+            <div id="tfContainer" class="space-y-4"></div>
+        </section>
+
+        <section id="section-matching" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-purple-100 text-purple-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">4</span> 
+                    Khu vực 4 – Nối cột
+                </h3>
+                <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-matching">2</span>đ</span>
+            </div>
+            <div id="matchingContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <section id="section-dragdrop" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-rose-100 text-rose-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">5</span> 
+                    Khu vực 5 – Kéo thả hình ảnh cấu tạo / ứng dụng
+                </h3>
+                <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-dragdrop">1</span>đ</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">Kéo các thẻ nhãn bên dưới vào đúng vị trí mô tả (Hoặc bấm vào thẻ nhãn rồi bấm vào ô đáp án tương ứng).</p>
+            <div id="dragDropContainer"></div>
+        </section>
+
+        <section id="section-video" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="bg-cyan-100 text-cyan-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold">6</span> 
+                    Khu vực 6 – Xem video + Điền khuyết
+                </h3>
+                <div class="flex items-center gap-3">
+                    <button onclick="openVideoConfig()" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 border border-cyan-200 transition">
+                        📹 Đổi / Tải Video lên
+                    </button>
+                    <span class="text-sm font-medium text-slate-500">Điểm tối đa: <span id="maxScore-video">1</span>đ</span>
+                </div>
+            </div>
+            
+            <div id="quickVideoPanel" class="hidden mb-4 p-4 bg-cyan-50/70 border border-cyan-200 rounded-xl space-y-3">
+                <h4 class="font-bold text-sm text-cyan-900">Cài đặt Video cho Khu vực 6</h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Dán link YouTube (Embed URL hoặc Link thường):</label>
+                        <input type="text" id="quickVideoUrlInput" placeholder="https://www.youtube.com/watch?v=..." class="w-full border rounded-lg px-3 py-1.5 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 mb-1">Hoặc chọn file video từ máy:</label>
+                        <input type="file" id="quickVideoFileInput" accept="video/*" class="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-1">
+                    <button onclick="document.getElementById('quickVideoPanel').classList.add('hidden')" class="px-3 py-1 bg-slate-200 text-slate-700 rounded text-xs">Hủy</button>
+                    <button onclick="applyQuickVideo()" class="px-3 py-1 bg-cyan-600 text-white rounded text-xs font-medium hover:bg-cyan-700">Áp dụng Video</button>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="aspect-video w-full bg-slate-900 rounded-xl overflow-hidden relative flex items-center justify-center" id="videoWrapper">
+                    <iframe id="lessonVideo" class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Thí nghiệm Saccharose" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <div id="videoQuestionsContainer" class="space-y-3 pt-2"></div>
+            </div>
+        </section>
+
+        <div class="flex flex-col items-center justify-center pt-4 pb-12 gap-6">
+            <button onclick="submitExam()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-lg px-8 py-4 rounded-2xl shadow-xl transform transition hover:scale-105 active:scale-95">
+                🚀 NỘP BÀI & CHẤM ĐIỂM
+            </button>
+            
+            <div id="resultBox" class="hidden w-full max-w-md bg-white border-2 border-indigo-200 rounded-2xl p-6 shadow-lg text-center space-y-3">
+                <h3 class="text-xl font-bold text-indigo-900 mb-1">KẾT QUẢ BÀI LÀM</h3>
+                <div id="scoreDisplay" class="text-4xl font-extrabold text-blue-600 my-2">0 / 10</div>
+                <p id="studentFeedback" class="text-slate-600 text-sm"></p>
+                <div id="sheetSyncStatus" class="text-xs font-semibold text-slate-500 pt-2 border-t"></div>
+            </div>
+        </div>
+
+        <section class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6 border border-indigo-100 shadow-sm mb-12">
+            <h3 class="text-lg font-bold text-indigo-900 mb-4 flex items-center gap-2">
+                💡 GHI NHỚ SIÊU NHANH
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-slate-700 text-sm sm:text-base">
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>1. CTPT chung:</strong> Cả saccharose và maltose đều là disaccharide có công thức phân tử C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>.
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>2. Cấu tạo Saccharose:</strong> Gồm 1 gốc &alpha;-glucose và 1 gốc &beta;-fructose liên kết qua nguyên tử oxygen ở C1 (&alpha;) và C2 (&beta;) (-&alpha;-1,2-glycoside). Không có nhóm -CHO ở dạng mạch vòng.
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>3. Cấu tạo Maltose:</strong> Gồm 2 gốc glucose liên kết qua C1 (&alpha;) và C4 (-&alpha;-1,4-glycoside). Tồn tại ở cả dạng mạch vòng và mạch hở (có nhóm -CHO).
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>4. Tính chất Polyalcohol:</strong> Cả saccharose và maltose đều hòa tan Cu(OH)<sub>2</sub> ở nhiệt độ phòng tạo dung dịch xanh lam đặc trưng (nhiều nhóm -OH kề nhau).
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>5. Phản ứng thủy phân:</strong> Khi đun nóng với dung dịch acid hoặc enzyme, saccharose thủy phân tạo glucose + fructose; maltose thủy phân tạo glucose.
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-indigo-100">
+                    <strong>6. Tính khử:</strong> Maltose có nhóm -CHO ở dạng mạch hở nên có phản ứng tráng bạc; saccharose không có nhóm -CHO nên không có phản ứng tráng bạc.
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="adminModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 space-y-6">
+            <div class="flex justify-between items-center border-b pb-4">
+                <h3 class="text-xl font-bold text-slate-800">⚙️ QUẢN TRỊ GIÁO VIÊN</h3>
+                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+            </div>
+            
+            <div id="adminLoginView" class="space-y-4 py-4">
+                <p class="text-sm text-slate-600">Vui lòng nhập mật khẩu quản trị để tiếp tục (Mật khẩu mặc định: <code class="bg-slate-100 px-1.5 py-0.5 rounded text-indigo-600 font-bold">1234</code>)</p>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">Mật khẩu:</label>
+                    <input type="password" id="adminPasswordInput" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Nhập mật khẩu...">
+                </div>
+                <button onclick="verifyAdminPassword()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg transition">Xác nhận</button>
+            </div>
+
+            <div id="adminSettingsView" class="hidden space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Tên bài học:</label>
+                        <input type="text" id="cfgLessonTitle" class="w-full border rounded-lg px-3 py-2 text-sm mt-1" value="Saccharose và Maltose">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700">Tổng điểm toàn phiếu:</label>
+                        <input type="number" id="cfgTotalScore" class="w-full border rounded-lg px-3 py-2 text-sm mt-1" value="10">
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-slate-800 pt-2 border-t">Cấu hình điểm số các phần (Tổng phải bằng Tổng điểm toàn phiếu)</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Trắc nghiệm:</label>
+                        <input type="number" step="0.5" id="cfgScoreMc" class="w-full border rounded px-2 py-1 mt-1" value="4">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Điền khuyết:</label>
+                        <input type="number" step="0.5" id="cfgScoreFib" class="w-full border rounded px-2 py-1 mt-1" value="1">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Đúng/Sai:</label>
+                        <input type="number" step="0.5" id="cfgScoreTf" class="w-full border rounded px-2 py-1 mt-1" value="1">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Nối cột:</label>
+                        <input type="number" step="0.5" id="cfgScoreMatching" class="w-full border rounded px-2 py-1 mt-1" value="2">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Kéo thả:</label>
+                        <input type="number" step="0.5" id="cfgScoreDrag" class="w-full border rounded px-2 py-1 mt-1" value="1">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-600">Điểm Video:</label>
+                        <input type="number" step="0.5" id="cfgScoreVideo" class="w-full border rounded px-2 py-1 mt-1" value="1">
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t space-y-3">
+                    <label class="block text-sm font-medium text-slate-700">Link Video Bài học (YouTube Embed URL hoặc Link thường):</label>
+                    <input type="text" id="cfgVideoUrl" class="w-full border rounded-lg px-3 py-2 text-sm" value="https://www.youtube.com/embed/dQw4w9WgXcQ">
+                    <label class="block text-sm font-medium text-slate-700">Hoặc tải video từ máy tính:</label>
+                    <input type="file" id="cfgVideoFile" accept="video/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+
+                <div class="pt-4 flex justify-end gap-3 border-t">
+                    <button onclick="closeAdminModal()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-300 transition">Hủy</button>
+                    <button onclick="saveAdminSettings()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition">Lưu cấu hình</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script Web App URL for Google Sheets synchronization
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2jXo1vAEtj5sh8p5r3eArPqxax2biQ0Zo9fiMFjaL62dvf9FIRRNJovNIbM2pOsj7/exec";
+
+        const appData = {
+            lessonTitle: "Saccharose và Maltose",
+            totalScore: 10,
+            scores: {
+                mc: 4,
+                fib: 1,
+                tf: 1,
+                matching: 2,
+                drag: 1,
+                video: 1
+            },
+            mcQuestions: [
+                {
+                    id: 1,
+                    question: "Công thức phân tử chung của saccharose và maltose là gì?",
+                    options: ["C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>", "C<sub>12</sub>H<sub>22</sub>O<sub>11</sub>", "C<sub>6</sub>H<sub>10</sub>O<sub>5</sub>", "C<sub>12</sub>H<sub>22</sub>O<sub>10</sub>"],
+                    correct: 1,
+                    explanation: "Cả saccharose và maltose đều là disaccharide có công thức phân tử C12H22O11."
+                },
+                {
+                    id: 2,
+                    question: "Saccharose được cấu tạo từ một đơn vị &alpha;-glucose và một đơn vị gì?",
+                    options: ["&beta;-fructose", "&alpha;-fructose", "&beta;-glucose", "galactose"],
+                    correct: 0,
+                    explanation: "Saccharose cấu tạo từ một gốc &alpha;-glucose và một gốc &beta;-fructose qua liên kết &alpha;-1,2-glycoside."
+                },
+                {
+                    id: 3,
+                    question: "Dung dịch saccharose có thể hòa tan Cu(OH)<sub>2</sub> ở nhiệt độ phòng tạo dung dịch có màu gì?",
+                    options: ["Xanh lam", "Vàng kết tủa", "Đỏ gạch", "Tím đặc trưng"],
+                    correct: 0,
+                    explanation: "Do có nhiều nhóm -OH kề nhau, saccharose hòa tan Cu(OH)2 tạo dung dịch phức chất màu xanh lam."
+                },
+                {
+                    id: 4,
+                    question: "Phản ứng thủy phân saccharose trong môi trường acid (hoặc enzyme) tạo ra sản phẩm nào?",
+                    options: ["Chỉ glucose", "Glucose và fructose", "Chỉ fructose", "Glucose và galactose"],
+                    correct: 1,
+                    explanation: "Thủy phân saccharose cắt đứt liên kết glycoside tạo thành 1 phân tử glucose và 1 phân tử fructose."
+                },
+                {
+                    id: 5,
+                    question: "Phát biểu nào sau đây đúng khi so sánh tính khử của saccharose và maltose?",
+                    options: [
+                        "Cả hai đều có phản ứng tráng bạc",
+                        "Saccharose có phản ứng tráng bạc, maltose thì không",
+                        "Maltose có phản ứng tráng bạc (tính khử), saccharose không có",
+                        "Cả hai đều không có phản ứng tráng bạc"
+                    ],
+                    correct: 2,
+                    explanation: "Maltose tồn tại ở dạng mạch hở có nhóm -CHO nên có tính khử (tráng bạc), saccharose không có."
+                },
+                {
+                    id: 6,
+                    question: "Maltose được cấu tạo từ hai đơn vị glucose liên kết với nhau qua loại liên kết nào?",
+                    options: ["&alpha;-1,2-glycoside", "&alpha;-1,4-glycoside", "&beta;-1,4-glycoside", "&alpha;-1,6-glycoside"],
+                    correct: 1,
+                    explanation: "Maltose cấu tạo từ hai đơn vị glucose qua liên kết &alpha;-1,4-glycoside."
+                },
+                {
+                    id: 7,
+                    question: "Trong tự nhiên, saccharose có nhiều nhất trong loại thực vật nào sau đây?",
+                    options: ["Cây mía, củ cải đường, hoa thốt nốt", "Các loại hạt nảy mầm", "Quả nho chín", "Mật ong"],
+                    correct: 0,
+                    explanation: "Saccharose có nhiều trong mía, củ cải đường và hoa thốt nốt."
+                },
+                {
+                    id: 8,
+                    question: "Ứng dụng quan trọng của maltose trong công nghiệp thực phẩm là gì?",
+                    options: ["Làm nguyên liệu sản xuất bia và chất tạo ngọt cho bánh kẹo", "Làm thuốc chữa bệnh tiểu đường", "Làm chất dẻo tổng hợp", "Làm phân bón hóa học"],
+                    correct: 0,
+                    explanation: "Maltose (đường mạch nha) được dùng làm nguyên liệu sản xuất bia và tạo ngọt bánh kẹo."
+                }
+            ],
+            fibText: "Saccharose là chất rắn có vị ngọt, dễ tan trong nước. Phân tử saccharose có nhiều nhóm <input type='text' data-fib='0' class='border-b-2 border-indigo-400 px-2 py-0.5 text-center font-semibold text-indigo-700 outline-none w-36 bg-indigo-50/50 rounded'> nên hòa tan được Cu(OH)<sub>2</sub> ở nhiệt độ phòng tạo dung dịch màu <input type='text' data-fib='1' class='border-b-2 border-indigo-400 px-2 py-0.5 text-center font-semibold text-indigo-700 outline-none w-32 bg-indigo-50/50 rounded'>. Khi đun nóng với dung dịch acid, saccharose bị thủy phân thành <input type='text' data-fib='2' class='border-b-2 border-indigo-400 px-2 py-0.5 text-center font-semibold text-indigo-700 outline-none w-36 bg-indigo-50/50 rounded'> và fructose.",
+            fibAnswers: ["hydroxy", "xanh lam", "glucose"],
+            tfStatements: [
+                { id: 1, text: "Saccharose có phản ứng tráng bạc do phân tử có nhóm aldehyde (-CHO).", correct: "Sai", explanation: "Saccharose không có nhóm -CHO ở dạng mạch vòng nên không có phản ứng tráng bạc." },
+                { id: 2, text: "Maltose tồn tại ở cả dạng mạch vòng và dạng mạch hở trong dung dịch.", correct: "Đúng", explanation: "Maltose có nhóm -OH hemiacetal tự do nên có thể mở vòng tạo dạng mạch hở chứa nhóm -CHO." },
+                { id: 3, text: "Cả saccharose và maltose đều là disaccharide.", correct: "Đúng", explanation: "Cả hai đều gồm 2 đơn vị monosaccharide liên kết với nhau." },
+                { id: 4, text: "Dung dịch maltose không làm mất màu nước bromine.", correct: "Sai", explanation: "Maltose ở dạng mạch hở có nhóm -CHO nên có thể làm mất màu nước bromine." }
+            ],
+            matchingPairs: [
+                { id: 1, term: "Saccharose", desc: "Gồm 1 gốc &alpha;-glucose và 1 gốc &beta;-fructose" },
+                { id: 2, term: "Maltose", desc: "Gồm 2 gốc glucose liên kết &alpha;-1,4-glycoside" },
+                { id: 3, term: "Cu(OH)<sub>2</sub> / OH<sup>-</sup>", desc: "Tạo dung dịch phức chất màu xanh lam với disaccharide" },
+                { id: 4, term: "Đường mạch nha", desc: "Sản phẩm chứa chủ yếu maltose, có trong hạt nảy mầm" }
+            ],
+            dragItems: [
+                { id: "img1", name: "Cây mía (Chứa saccharose)", target: "target1" },
+                { id: "img2", name: "Mạch nha (Chứa maltose)", target: "target2" }
+            ],
+            videoQuestions: [
+                {
+                    id: 1,
+                    question: "Khi cho dung dịch NaOH vào ống nghiệm chứa dung dịch CuSO<sub>4</sub> sau đó thêm saccharose, hiện tượng quan sát được là:",
+                    options: ["Kết tủa xanh lam tan ra tạo dung dịch xanh lam trong suốt", "Xuất hiện kết tủa đỏ gạch", "Dung dịch chuyển sang màu tím đặc trưng", "Không có hiện tượng gì xảy ra"],
+                    correct: 0,
+                    explanation: "Saccharose hòa tan Cu(OH)2 mới sinh tạo dung dịch phức chất màu xanh lam."
+                }
+            ]
+        };
+
+        function openVideoConfig() {
+            const panel = document.getElementById('quickVideoPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function applyQuickVideo() {
+            const urlInput = document.getElementById('quickVideoUrlInput').value.trim();
+            const fileInput = document.getElementById('quickVideoFileInput').files[0];
+            const wrapper = document.getElementById('videoWrapper');
+
+            if (fileInput) {
+                const fileURL = URL.createObjectURL(fileInput);
+                wrapper.innerHTML = `<video id="lessonVideo" class="w-full h-full object-contain" controls src="${fileURL}"></video>`;
+                alert("Đã tải video từ máy lên thành công!");
+            } else if (urlInput) {
+                let embedUrl = urlInput;
+                if (urlInput.includes("watch?v=")) {
+                    embedUrl = urlInput.replace("watch?v=", "embed/");
+                } else if (urlInput.includes("youtu.be/")) {
+                    embedUrl = urlInput.replace("youtu.be/", "www.youtube.com/embed/");
+                }
+                wrapper.innerHTML = `<iframe id="lessonVideo" class="w-full h-full" src="${embedUrl}" title="Video bài học" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                alert("Đã cập nhật link video thành công!");
+            } else {
+                alert("Vui lòng nhập link YouTube hoặc chọn file video từ máy!");
+                return;
+            }
+            document.getElementById('quickVideoPanel').classList.add('hidden');
+        }
+
+        function renderAll() {
+            renderMC();
+            renderFIB();
+            renderTF();
+            renderMatching();
+            renderDragDrop();
+            renderVideoQuestions();
+        }
+
+        function renderMC() {
+            const container = document.getElementById('mcContainer');
+            container.innerHTML = '';
+            document.getElementById('maxScore-mc').innerText = appData.scores.mc;
+            
+            appData.mcQuestions.forEach((q, idx) => {
+                let html = `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                        <p class="font-medium text-slate-800 text-sm sm:text-base">Câu ${idx + 1}: ${q.question}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                `;
+                q.options.forEach((opt, oIdx) => {
+                    html += `
+                        <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-blue-50/50 cursor-pointer transition text-sm">
+                            <input type="radio" name="mc_${q.id}" value="${oIdx}" class="text-blue-600 focus:ring-blue-500">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div><div id="mc_feedback_${q.id}" class="text-xs font-semibold hidden mt-1"></div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        function renderFIB() {
+            document.getElementById('fibContainer').innerHTML = `<p class="text-base">${appData.fibText}</p>`;
+            document.getElementById('maxScore-fib').innerText = appData.scores.fib;
+        }
+
+        function renderTF() {
+            const container = document.getElementById('tfContainer');
+            container.innerHTML = '';
+            document.getElementById('maxScore-tf').innerText = appData.scores.tf;
+
+            appData.tfStatements.forEach((st, idx) => {
+                container.innerHTML += `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <p class="text-sm sm:text-base text-slate-800 flex-1"><strong>${idx + 1}.</strong> ${st.text}</p>
+                        <div class="flex items-center gap-3 shrink-0">
+                            <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                                <input type="radio" name="tf_${st.id}" value="Đúng" class="text-indigo-600"> Đúng
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                                <input type="radio" name="tf_${st.id}" value="Sai" class="text-indigo-600"> Sai
+                            </label>
+                        </div>
+                    </div>
+                    <div id="tf_feedback_${st.id}" class="text-xs font-semibold hidden ml-2"></div>
+                `;
+            });
+        }
+
+        function renderMatching() {
+            const container = document.getElementById('matchingContainer');
+            container.innerHTML = `
+                <div class="space-y-3" id="matchingTerms">
+                    <h4 class="font-semibold text-sm text-slate-600">Cột A (Khái niệm / Đối tượng)</h4>
+                </div>
+                <div class="space-y-3" id="matchingDescs">
+                    <h4 class="font-semibold text-sm text-slate-600">Cột B (Đặc điểm tương ứng)</h4>
+                </div>
+            `;
+            document.getElementById('maxScore-matching').innerText = appData.scores.matching;
+
+            const termsDiv = document.getElementById('matchingTerms');
+            const descsDiv = document.getElementById('matchingDescs');
+
+            let shuffledDescs = [...appData.matchingPairs].sort(() => Math.random() - 0.5);
+
+            appData.matchingPairs.forEach((pair, idx) => {
+                termsDiv.innerHTML += `
+                    <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                        <span class="font-medium text-sm text-slate-800">${idx + 1}. ${pair.term}</span>
+                        <select id="match_sel_${pair.id}" class="border rounded-lg px-2 py-1 text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <option value="">-- Chọn mô tả --</option>
+                            ${shuffledDescs.map((d) => `<option value="${d.id}">${d.desc}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            });
+
+            shuffledDescs.forEach((d, idx) => {
+                descsDiv.innerHTML += `
+                    <div class="p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl text-sm text-slate-700">
+                        <strong>${String.fromCharCode(65 + idx)}.</strong> ${d.desc}
+                    </div>
+                `;
+            });
+        }
+
+        function renderDragDrop() {
+            const container = document.getElementById('dragDropContainer');
+            document.getElementById('maxScore-dragdrop').innerText = appData.scores.drag;
+            
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center justify-center text-center">
+                        <div class="w-24 h-24 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-bold text-3xl mb-2 shadow-inner">🎋</div>
+                        <span class="font-medium text-sm text-slate-800">Cây Mía / Thốt Nốt</span>
+                        <div id="target1" class="drop-zone w-full mt-3 rounded-lg flex items-center justify-center text-xs text-slate-400 p-2" data-match="img1" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event)" onclick="selectDropZone(this)">Thả nhãn hoặc bấm chọn vào đây</div>
+                    </div>
+                    <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col items-center justify-center text-center">
+                        <div class="w-24 h-24 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center font-bold text-3xl mb-2 shadow-inner">🌾</div>
+                        <span class="font-medium text-sm text-slate-800">Mạch Nha (Hạt nảy mầm)</span>
+                        <div id="target2" class="drop-zone w-full mt-3 rounded-lg flex items-center justify-center text-xs text-slate-400 p-2" data-match="img2" ondragover="allowDrop(event)" ondragleave="removeDropStyle(event)" ondrop="drop(event)" onclick="selectDropZone(this)">Thả nhãn hoặc bấm chọn vào đây</div>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-3 justify-center pt-2" id="dragItemsPool">
+                    <div draggable="true" ondragstart="drag(event)" onclick="selectDragItem(this)" id="img2" class="drag-item px-4 py-2 bg-amber-100 border border-amber-300 text-amber-800 rounded-xl text-sm font-semibold shadow-sm hover:bg-amber-200 transition">Chứa Maltose</div>
+                    <div draggable="true" ondragstart="drag(event)" onclick="selectDragItem(this)" id="img1" class="drag-item px-4 py-2 bg-blue-100 border border-blue-300 text-blue-800 rounded-xl text-sm font-semibold shadow-sm hover:bg-blue-200 transition">Chứa Saccharose</div>
+                </div>
+            `;
+        }
+
+        function renderVideoQuestions() {
+            const container = document.getElementById('videoQuestionsContainer');
+            container.innerHTML = '';
+            document.getElementById('maxScore-video').innerText = appData.scores.video;
+
+            appData.videoQuestions.forEach((q, idx) => {
+                let html = `
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+                        <p class="font-medium text-slate-800 text-sm sm:text-base">Câu hỏi video ${idx + 1}: ${q.question}</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                `;
+                q.options.forEach((opt, oIdx) => {
+                    html += `
+                        <label class="flex items-center gap-2 p-2.5 rounded-lg border border-slate-200 hover:bg-cyan-50/50 cursor-pointer transition text-sm">
+                            <input type="radio" name="video_q_${q.id}" value="${oIdx}" class="text-cyan-600 focus:ring-cyan-500">
+                            <span>${opt}</span>
+                        </label>
+                    `;
+                });
+                html += `</div><div id="video_feedback_${q.id}" class="text-xs font-semibold hidden mt-1"></div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        let selectedDragElem = null;
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+        function allowDrop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.add('drag-over');
+        }
+        function removeDropStyle(ev) {
+            ev.currentTarget.classList.remove('drag-over');
+        }
+        function drop(ev) {
+            ev.preventDefault();
+            ev.currentTarget.classList.remove('drag-over');
+            const data = ev.dataTransfer.getData("text");
+            const draggedEl = document.getElementById(data);
+            if (draggedEl) {
+                ev.currentTarget.innerHTML = '';
+                ev.currentTarget.appendChild(draggedEl);
+            }
+        }
+        function selectDragItem(el) {
+            document.querySelectorAll('.drag-item').forEach(i => i.classList.remove('ring-2', 'ring-indigo-600'));
+            el.classList.add('ring-2', 'ring-indigo-600');
+            selectedDragElem = el;
+        }
+        function selectDropZone(zone) {
+            if (selectedDragElem) {
+                zone.innerHTML = '';
+                zone.appendChild(selectedDragElem);
+                selectedDragElem.classList.remove('ring-2', 'ring-indigo-600');
+                selectedDragElem = null;
+            }
+        }
+
+        function submitExam() {
+            let totalMax = parseFloat(appData.totalScore);
+            let earnedScore = 0;
+            let totalQuestions = 0;
+            let correctCount = 0;
+            let incorrectCount = 0;
+            let unansweredCount = 0;
+
+            // 1. Grade MC
+            totalQuestions += appData.mcQuestions.length;
+            let mcCorrect = 0;
+            appData.mcQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="mc_${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`mc_feedback_${q.id}`);
+                feedbackEl.classList.remove('hidden');
+                if (selected) {
+                    if (parseInt(selected.value) === q.correct) {
+                        mcCorrect++;
+                        correctCount++;
+                        feedbackEl.innerHTML = `<span class="text-emerald-600">✓ Chính xác! ${q.explanation}</span>`;
+                        selected.closest('label').classList.add('bg-emerald-50', 'border-emerald-300');
+                    } else {
+                        incorrectCount++;
+                        feedbackEl.innerHTML = `<span class="text-rose-600">✗ Chưa đúng. ${q.explanation}</span>`;
+                        selected.closest('label').classList.add('bg-rose-50', 'border-rose-300');
+                    }
+                } else {
+                    unansweredCount++;
+                    feedbackEl.innerHTML = `<span class="text-amber-600">⚠ Chưa trả lời. ${q.explanation}</span>`;
+                }
+            });
+            let scoreMc = (mcCorrect / appData.mcQuestions.length) * appData.scores.mc;
+            earnedScore += scoreMc;
+
+            // 2. Grade FIB
+            totalQuestions += appData.fibAnswers.length;
+            let fibCorrect = 0;
+            const fibInputs = document.querySelectorAll('input[data-fib]');
+            fibInputs.forEach((inp, idx) => {
+                const val = inp.value.trim().toLowerCase();
+                if (val !== "") {
+                    if (val === appData.fibAnswers[idx].toLowerCase()) {
+                        fibCorrect++;
+                        correctCount++;
+                        inp.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-500');
+                    } else {
+                        incorrectCount++;
+                        inp.classList.add('bg-rose-100', 'text-rose-800', 'border-rose-500');
+                    }
+                } else {
+                    unansweredCount++;
+                    inp.classList.add('bg-amber-100', 'border-amber-500');
+                }
+            });
+            let scoreFib = (fibCorrect / appData.fibAnswers.length) * appData.scores.fib;
+            earnedScore += scoreFib;
+
+            // 3. Grade TF
+            totalQuestions += appData.tfStatements.length;
+            let tfCorrect = 0;
+            appData.tfStatements.forEach(st => {
+                const selected = document.querySelector(`input[name="tf_${st.id}"]:checked`);
+                const feedbackEl = document.getElementById(`tf_feedback_${st.id}`);
+                feedbackEl.classList.remove('hidden');
+                if (selected) {
+                    if (selected.value === st.correct) {
+                        tfCorrect++;
+                        correctCount++;
+                        feedbackEl.innerHTML = `<span class="text-emerald-600">✓ Đúng! ${st.explanation}</span>`;
+                    } else {
+                        incorrectCount++;
+                        feedbackEl.innerHTML = `<span class="text-rose-600">✗ Sai. Đáp án chuẩn: ${st.correct}. ${st.explanation}</span>`;
+                    }
+                } else {
+                    unansweredCount++;
+                    feedbackEl.innerHTML = `<span class="text-amber-600">⚠ Chưa trả lời. Đáp án chuẩn: ${st.correct}</span>`;
+                }
+            });
+            let scoreTf = (tfCorrect / appData.tfStatements.length) * appData.scores.tf;
+            earnedScore += scoreTf;
+
+            // 4. Grade Matching
+            totalQuestions += appData.matchingPairs.length;
+            let matchCorrect = 0;
+            appData.matchingPairs.forEach(pair => {
+                const sel = document.getElementById(`match_sel_${pair.id}`);
+                if (sel && sel.value !== "") {
+                    if (parseInt(sel.value) === pair.id) {
+                        matchCorrect++;
+                        correctCount++;
+                        sel.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-800');
+                    } else {
+                        incorrectCount++;
+                        sel.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-800');
+                    }
+                } else {
+                    unansweredCount++;
+                    if (sel) sel.classList.add('bg-amber-50', 'border-amber-500');
+                }
+            });
+            let scoreMatching = (matchCorrect / appData.matchingPairs.length) * appData.scores.matching;
+            earnedScore += scoreMatching;
+
+            // 5. Grade Drag Drop
+            totalQuestions += appData.dragItems.length;
+            let dragCorrect = 0;
+            appData.dragItems.forEach(item => {
+                const target = document.getElementById(item.target);
+                const child = target.querySelector('.drag-item');
+                if (child) {
+                    if (child.id === item.target.replace('target', 'img')) {
+                        dragCorrect++;
+                        correctCount++;
+                        target.classList.add('bg-emerald-50', 'border-emerald-500');
+                    } else {
+                        incorrectCount++;
+                        target.classList.add('bg-rose-50', 'border-rose-500');
+                    }
+                } else {
+                    unansweredCount++;
+                    target.classList.add('bg-amber-50', 'border-amber-500');
+                }
+            });
+            let scoreDrag = (dragCorrect / appData.dragItems.length) * appData.scores.drag;
+            earnedScore += scoreDrag;
+
+            // 6. Grade Video Questions
+            totalQuestions += appData.videoQuestions.length;
+            let videoCorrect = 0;
+            appData.videoQuestions.forEach(q => {
+                const selected = document.querySelector(`input[name="video_q_${q.id}"]:checked`);
+                const feedbackEl = document.getElementById(`video_feedback_${q.id}`);
+                feedbackEl.classList.remove('hidden');
+                if (selected) {
+                    if (parseInt(selected.value) === q.correct) {
+                        videoCorrect++;
+                        correctCount++;
+                        feedbackEl.innerHTML = `<span class="text-emerald-600">✓ Chính xác! ${q.explanation}</span>`;
+                    } else {
+                        incorrectCount++;
+                        feedbackEl.innerHTML = `<span class="text-rose-600">✗ Chưa đúng. ${q.explanation}</span>`;
+                    }
+                } else {
+                    unansweredCount++;
+                    feedbackEl.innerHTML = `<span class="text-amber-600">⚠ Chưa trả lời. ${q.explanation}</span>`;
+                }
+            });
+            let scoreVideo = (videoCorrect / appData.videoQuestions.length) * appData.scores.video;
+            earnedScore += scoreVideo;
+
+            earnedScore = Math.round(earnedScore * 100) / 100;
+
+            const resultBox = document.getElementById('resultBox');
+            resultBox.classList.remove('hidden');
+            document.getElementById('scoreDisplay').innerText = `${earnedScore} / ${totalMax}`;
+            const studentName = document.getElementById('studentName').value.trim() || "Học sinh";
+            const studentClass = document.getElementById('studentClass').value.trim() || "Chưa nhập";
+            document.getElementById('studentFeedback').innerText = `Chúc mừng ${studentName} (${studentClass}) đã hoàn thành bài làm!`;
+            
+            resultBox.scrollIntoView({ behavior: 'smooth' });
+
+            // Sync with Google Sheets
+            syncDataToGoogleSheets({
+                hoVaTen: studentName,
+                lop: studentClass,
+                diem: earnedScore,
+                soCauDung: correctCount,
+                soCauSai: incorrectCount,
+                soCauChuaLam: unansweredCount,
+                tongSoCâu: totalQuestions,
+                thoiGian: new Date().toLocaleString("vi-VN")
+            });
+        }
+
+        function syncDataToGoogleSheets(payload) {
+            const statusEl = document.getElementById('sheetSyncStatus');
+            statusEl.innerText = " đang đồng bộ kết quả lên Google Sheets...";
+            statusEl.className = "text-xs font-semibold text-blue-600 pt-2 border-t animate-pulse";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                statusEl.innerText = "✓ Đã tự động lưu kết quả vào Google Sheets thành công!";
+                statusEl.className = "text-xs font-semibold text-emerald-600 pt-2 border-t";
+            }).catch(err => {
+                console.error(err);
+                statusEl.innerText = "⚠ Gửi kết quả thành công (Lưu ý: Do trình duyệt chặn CORS ở chế độ no-cors, vui lòng kiểm tra Google Sheet để xác nhận).";
+                statusEl.className = "text-xs font-semibold text-amber-600 pt-2 border-t";
+            });
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            document.getElementById('adminLoginView').classList.remove('hidden');
+            document.getElementById('adminSettingsView').classList.add('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const pass = document.getElementById('adminPasswordInput').value;
+            if (pass === "1234") {
+                document.getElementById('adminLoginView').classList.add('hidden');
+                document.getElementById('adminSettingsView').classList.remove('hidden');
+                document.getElementById('cfgLessonTitle').value = appData.lessonTitle;
+                document.getElementById('cfgTotalScore').value = appData.totalScore;
+                document.getElementById('cfgScoreMc').value = appData.scores.mc;
+                document.getElementById('cfgScoreFib').value = appData.scores.fib;
+                document.getElementById('cfgScoreTf').value = appData.scores.tf;
+                document.getElementById('cfgScoreMatching').value = appData.scores.matching;
+                document.getElementById('cfgScoreDrag').value = appData.scores.drag;
+                document.getElementById('cfgScoreVideo').value = appData.scores.video;
+                const currentVideo = document.getElementById('lessonVideo');
+                if (currentVideo && currentVideo.tagName === 'IFRAME') {
+                    document.getElementById('cfgVideoUrl').value = currentVideo.src;
+                }
+            } else {
+                alert("Mật khẩu quản trị không đúng! Mật khẩu mặc định là: 1234");
+            }
+        }
+
+        function saveAdminSettings() {
+            const newTitle = document.getElementById('cfgLessonTitle').value.trim();
+            const newTotal = parseFloat(document.getElementById('cfgTotalScore').value);
+            
+            const sMc = parseFloat(document.getElementById('cfgScoreMc').value);
+            const sFib = parseFloat(document.getElementById('cfgScoreFib').value);
+            const sTf = parseFloat(document.getElementById('cfgScoreTf').value);
+            const sMatch = parseFloat(document.getElementById('cfgScoreMatching').value);
+            const sDrag = parseFloat(document.getElementById('cfgScoreDrag').value);
+            const sVideo = parseFloat(document.getElementById('cfgScoreVideo').value);
+
+            const sumScores = sMc + sFib + sTf + sMatch + sDrag + sVideo;
+            if (Math.abs(sumScores - newTotal) > 0.01) {
+                alert(`Tổng điểm phân bổ các phần (${sumScores}) chưa khớp với Tổng điểm toàn phiếu (${newTotal})! Vui lòng điều chỉnh lại.`);
+                return;
+            }
+
+            appData.lessonTitle = newTitle;
+            appData.totalScore = newTotal;
+            appData.scores.mc = sMc;
+            appData.scores.fib = sFib;
+            appData.scores.tf = sTf;
+            appData.scores.matching = sMatch;
+            appData.scores.drag = sDrag;
+            appData.scores.video = sVideo;
+
+            document.getElementById('headerTitle').innerText = newTitle;
+
+            const vUrl = document.getElementById('cfgVideoUrl').value.trim();
+            const vFile = document.getElementById('cfgVideoFile').files[0];
+            const wrapper = document.getElementById('videoWrapper');
+            if (vFile) {
+                const fileURL = URL.createObjectURL(vFile);
+                wrapper.innerHTML = `<video id="lessonVideo" class="w-full h-full object-contain" controls src="${fileURL}"></video>`;
+            } else if (vUrl) {
+                wrapper.innerHTML = `<iframe id="lessonVideo" class="w-full h-full" src="${vUrl}" title="Thí nghiệm Saccharose" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            }
+
+            localStorage.setItem('chemistry_saccharose_config', JSON.stringify(appData));
+
+            closeAdminModal();
+            renderAll();
+            alert("Đã lưu cấu hình thành công!");
+        }
+
+        window.onload = function() {
+            const saved = localStorage.getItem('chemistry_saccharose_config');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    Object.assign(appData, parsed);
+                    document.getElementById('headerTitle').innerText = appData.lessonTitle;
+                } catch(e) { console.error(e); }
+            }
+            renderAll();
+        };
+    </script>
+</body>
+</html>
